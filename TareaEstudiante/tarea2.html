@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tarea 2</title>
+
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</head>
+
+<body onload="cargar()">
+    <div class="Contenedor">
+
+        <table>
+
+            <head>
+
+                <tr>
+                    <th>Matricula</th>
+                    <th>Nombre</th>
+                    <th>Nota1</th>
+                    <th>Nota 2</th>
+                    <th>Nota 3</th>
+                    <th>Nota 4</th>
+                    <th>Promedio</th>
+                    <th>Calificacion</th>
+
+                    <tbody id="tbDatos">
+
+                    </tbody>
+
+
+
+                </tr>
+
+
+
+            </head>
+
+        </table>
+        <div class="right">
+
+            <button onclick='Agregar();' class="btn #673ab7 deep-purple">Agregar</button>
+            <a href="grafica.html" class="btn #673ab7 deep-purple">Grafica</a>
+        </div>
+
+        <textarea style="display:none" id="modelo_id">
+            <td> <input value="{Matricula}" type="text"name="Matricula"></td>
+            <td> <input value="{Nombre}" type="text"name="Nombre"></td> 
+            <td> <input value="{nota1}" onkeyup="Calcular()"  type="text"name="nota1"></td> 
+            <td> <input value="{nota2}" onkeyup="Calcular()" type="text"name="nota2"></td>
+            <td> <input value="{nota3}" onkeyup="Calcular()" type="text"name="nota3"></td> 
+            <td> <input value="{nota4}" onkeyup="Calcular()"type="text"name="nota4"></td> 
+            <td> <input readonly value="{promedio}" onkeyup="Calcular()" type="text"name="promedio"></td> 
+            <td> <input readonly value="{Literal}" onkeyup="Calcular()" type="text"name="Literal"></td>
+            <td> <button  onclick="remover(this)" class="waves-effect  red darken-4 btn btn">X</button></td>
+           
+            
+      
+         </textarea>
+
+        <script>
+            function remover(btn) {
+                if (confirm("Seguro desea eliminarlo?")) {
+                    fila = btn.parentNode.parentNode;
+                    fila.parentNode.removeChild(fila);
+                    Guardar();
+
+                }
+
+
+            }
+
+
+
+            function Agregar() {
+                plantilla = document.getElementById("modelo_id").value;
+
+                obj = {
+                    Matricula: '',
+                    Nombre: '',
+                    nota1: '',
+                    nota2: '',
+                    nota3: '',
+                    nota4: '',
+                    promedio: '',
+                    Literal: ''
+                };
+                for (prop in obj) {
+                    plantilla = plantilla.replace('{' + prop + '}', obj[prop])
+
+                }
+
+                tr = document.createElement("tr");
+                tr.innerHTML = plantilla;
+                document.getElementById("tbDatos").appendChild(tr);
+
+
+            }
+
+
+
+            function _int(inp) {
+                rs = 0;
+                try {
+                    tep = parseInt(inp.value);
+                    if (!isNaN(tep)) {
+                        rs = tep;
+                    }
+                } catch (ex) {}
+                return rs;
+
+            }
+
+            function _lt(nota) {
+                lt = 'F';
+                if (nota >= 90) {
+                    lt = 'A'
+                } else if (nota >= 80) {
+                    lt = 'B'
+                } else if (nota >= 70) {
+                    lt = 'C'
+                }
+                return lt;
+
+            }
+
+            function cargar() {
+                tmp = localStorage.getItem('tarea2');
+                if (tmp != null) {
+                    datos = JSON.parse(tmp);
+
+                    for (x = 0; x < datos.length; x++) {
+                        plantilla = document.getElementById("modelo_id").value;
+
+                        obj = datos[x];
+                        for (prop in obj) {
+                            plantilla = plantilla.replace('{' + prop + '}', obj[prop])
+
+                        }
+
+                        tr = document.createElement("tr");
+                        tr.innerHTML = plantilla;
+                        document.getElementById("tbDatos").appendChild(tr);
+                    }
+
+                }
+
+
+
+
+            }
+
+
+            function Guardar() {
+
+                Matricula = document.getElementsByName('Matricula');
+                Nombre = document.getElementsByName('Nombre');
+                n1s = document.getElementsByName('nota1');
+                n2s = document.getElementsByName('nota2');
+                n3s = document.getElementsByName('nota3');
+                n4s = document.getElementsByName('nota4');
+                prome = document.getElementsByName('promedio');
+                literal = document.getElementsByName('Literal');
+                datos = []
+
+                for (x = 0; x < n1s.length; x++) {
+                    obj = {};
+                    obj.Matricula = Matricula[x].value;
+                    obj.Nombre = Nombre[x].value;
+                    obj.nota1 = n1s[x].value;
+                    obj.nota2 = n2s[x].value;
+                    obj.nota3 = n3s[x].value;
+                    obj.nota4 = n4s[x].value;
+                    obj.promedio = prome[x].value;
+                    obj.Literal = literal[x].value;
+                    datos.push(obj);
+                }
+
+                tmp = JSON.stringify(datos);
+                localStorage.setItem('tarea2', tmp);
+
+            }
+
+
+
+
+
+            function Calcular() {
+                n1s = document.getElementsByName('nota1');
+                n2s = document.getElementsByName('nota2');
+                n3s = document.getElementsByName('nota3');
+                n4s = document.getElementsByName('nota4');
+                prome = document.getElementsByName('promedio');
+                literal = document.getElementsByName('Literal');
+
+                for (x = 0; x < n1s.length; x++) {
+
+                    p = (_int(n1s[x]) + _int(n2s[x]) + _int(n3s[x]) + _int(n4s[x])) / 4;
+                    prome[x].value = p;
+                    literal[x].value = _lt(p);
+
+
+                }
+
+                Guardar();
+
+
+            }
+        </script>
+
+
+
+    </div>
+</body>
+
+</html>
